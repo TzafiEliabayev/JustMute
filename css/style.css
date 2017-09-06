@@ -1,0 +1,8 @@
+.menu-entry {
+  padding: 3px 4px 3px 8px;
+  cursor: pointer;
+}
+.menu-entry:hover {
+  -webkit-transition: all 0.3s ease-out;
+  background: #F2F2F2;
+}
