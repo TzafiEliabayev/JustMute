@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Set window button
   chrome.windows.getCurrent(function(window){
     console.log("window id is: " + window.id);
-    var muteStatus = chrome.extension.getBackgroundPage().getMuteStatusByWindow(window.id);
+    var muteStatus = chrome.extension.getBackgroundPage().windowMuteStatus[window.id];
     console.log("mute status of window is: " + muteStatus);
     setMuteWindowButtonText(muteStatus);
   });
@@ -51,10 +51,11 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("get current tab is: " + tab);
     var domain = chrome.extension.getBackgroundPage().getDomainFromUrl(tab.url);
     console.log("tab id is: " + tab.id + " and domain is: " + domain);
-    var muteStatus = chrome.extension.getBackgroundPage().getMuteStatusByDomain(tab.id);
+    var muteStatus = chrome.extension.getBackgroundPage().isUrlDomainMuted(tab.url);
     console.log("mute status of domain is: " + muteStatus);
     setMuteDomainButtonText(domain, muteStatus);
   });
+
   console.log("and now text: " + document.getElementById("muteWindowButton").innerHTML)
   document.getElementById("muteWindowButton").addEventListener('click', changeMuteStatusForAll);
   document.getElementById("muteDomainButton").addEventListener('click', changeMuteStatusForDomain);
