@@ -1,53 +1,61 @@
-// document.addEventListener('DOMContentLoaded', function(tab) {
-//     console.log("Click!");
-//     document.getElementById("muteButton").innerHTML  = "mute";
-//     console.log(chrome.extension.getBackgroundPage().getT());
-// });
-  // var viewTabUrl = chrome.extension.getURL('../popup.html');
+function getMuteTextByStatus(status){
+  if(status == true){
+    return "Unmute";
+  }
+  return "Mute";
+}
 
-  // console.log("muteStatus is: " + muteStatus);
-  // //var viewTabUrl = chrome.extension.getURL('image.html');
-  // // var imageUrl = /* an image's URL */;
+function setMuteDomainButtonText(domain, muteStatus){
+  console.log("setMuteDomainButtonText");
+  var button = document.getElementById("muteDomainButton");
+  var muteText = getMuteTextByStatus(muteStatus);
+  console.log("buttonText before is: " + button.innerHTML + " and mute status is " + muteStatus);
+  button.innerHTML = muteText + " Domain " + domain;
+  console.log("buttonText after is: " + button.innerHTML);
+}
 
-  // // // Look through all the pages in this extension to find one we can use.
-  // var views = chrome.extension.getViews();
-  // for (var i = 0; i < views.length; i++) {
-  //   var current = "view #" + i + "id is: " + views[i].id + "....and type is: " + views[i].type + ".....total of " + views[i].tabs.length + " tabs.";
-  //   console.log(current);
-  //   viewTabUrl.getElementById("muteButton").innerHTML  = current;
-  // //   // If this view has the right URL and hasn't been used yet...
-  // //   if (view.location.href == viewTabUrl && !view.imageAlreadySet) {
-
-  // //     // ...call one of its functions and set a property.
-  // //     view.setImageUrl(imageUrl);
-  // //     view.imageAlreadySet = true;
-  // //     break; // we're done
-  //   }
-//   }
-// )
-
-
+function setMuteWindowButtonText(muteStatus){
+  console.log("setMuteWindowButtonText");
+  var button = document.getElementById("muteWindowButton");
+  var muteText = getMuteTextByStatus(muteStatus);
+  console.log("buttonText before is: " + button.innerHTML + " and mute status is " + muteStatus);
+  button.innerHTML = muteText + " Window";
+  console.log("buttonText after is: " + button.innerHTML);
+}
 
 function changeMuteStatusForAll() {
   chrome.windows.getCurrent(function(window){
-    var newMuteStatus = chrome.extension.getBackgroundPage().updateWindowMute(window.id);
-    if(newMuteStatus){
-      document.getElementById("muteButton").innerHTML  = "Unmute Window";
-    } else{
-      document.getElementById("muteButton").innerHTML  = "Mute Window";
-    }
+    chrome.extension.getBackgroundPage().updateWindowMute(window.id);
   });
+  window.close();
 }
 
-document.addEventListener('DOMContentLoaded', function(tab) {
-  console.log(chrome.extension.getBackgroundPage().getT());
-  var muteWinButton = document.getElementById("muteButton");
-  if(chrome.extension.getBackgroundPage().getMuteStatusByWindow(tab.windowId)){
-    muteWinButton.innerHTML = "Unmute Window";
-  }
-  else{
-    muteWinButton.innerHTML = "Mute Window";
-  }
+function changeMuteStatusForDomain(){
 
-  muteWinButton.addEventListener('click', changeMuteStatusForAll);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("DOMContentLoaded");
+
+  // Set window button
+  chrome.windows.getCurrent(function(window){
+    console.log("window id is: " + window.id);
+    var muteStatus = chrome.extension.getBackgroundPage().getMuteStatusByWindow(window.id);
+    console.log("mute status of window is: " + muteStatus);
+    setMuteWindowButtonText(muteStatus);
+  });
+
+  // Set domain button
+  chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function (tabs){
+    var tab = tabs[0];
+    console.log("get current tab is: " + tab);
+    var domain = chrome.extension.getBackgroundPage().getDomainFromUrl(tab.url);
+    console.log("tab id is: " + tab.id + " and domain is: " + domain);
+    var muteStatus = chrome.extension.getBackgroundPage().getMuteStatusByDomain(tab.id);
+    console.log("mute status of domain is: " + muteStatus);
+    setMuteDomainButtonText(domain, muteStatus);
+  });
+  console.log("and now text: " + document.getElementById("muteWindowButton").innerHTML)
+  document.getElementById("muteWindowButton").addEventListener('click', changeMuteStatusForAll);
+  document.getElementById("muteDomainButton").addEventListener('click', changeMuteStatusForDomain);
 });
