@@ -10,7 +10,7 @@ function setMuteDomainButtonText(domain, muteStatus){
   var button = document.getElementById("muteDomainButton");
   var muteText = getMuteTextByStatus(muteStatus);
   console.log("buttonText before is: " + button.innerHTML + " and mute status is " + muteStatus);
-  button.innerHTML = muteText + " Domain " + domain;
+  button.innerHTML = muteText + " Domain '" + domain + "'";
   console.log("buttonText after is: " + button.innerHTML);
 }
 
@@ -31,7 +31,11 @@ function changeMuteStatusForAll() {
 }
 
 function changeMuteStatusForDomain(){
-
+  chrome.tabs.query({'active': true, 'lastFocusedWindow': true}, function (tabs){
+    var tab = tabs[0];
+    chrome.extension.getBackgroundPage().updateDomainMute(tab);
+  });
+  window.close();
 }
 
 document.addEventListener('DOMContentLoaded', function() {

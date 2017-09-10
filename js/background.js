@@ -127,6 +127,22 @@ function updateWindowMute(winId){
   });
 }
 
+// Changes and updates the tab's domain mute
+function updateDomainMute(tab){
+  console.log("METHOD [updateDomainMute], tabId: [" + tab.id + "]");
+  var domain = getDomainFromUrl(tab.url);
+  if(mutedDomain[domain] != null){
+    // Unmute domain
+    delete mutedDomain[domain];
+    muteUnmuteTab(tab, false);
+  }
+  else{
+    // Mute domain
+    mutedDomain[domain] = 1;
+    muteUnmuteTab(tab, true);
+  }
+}
+
 function handleWindowClosed(winId){
   console.log("METHOD [handleWindowClosed], winId: [" + winId + "]");
   chrome.tabs.query({windowId: winId}, function(tabs){
